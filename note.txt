@@ -1,2 +1,4 @@
 So, if the number for the note is higher than 11, it modulos but goes into the next octave, but I have a way to allow people to pick
 in mind, will talk to you tomorrow
+
+EDIT: Can't seem to make any progress, will just keep in the fifth octave for now
