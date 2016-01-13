@@ -41,7 +41,7 @@ for x in range(width):
 number_of_pixels = len(colors)
 
 #Desired length of song in seconds
-desired_duration = 300
+desired_duration = 120
 #Desired beats per minute
 desired_bpm = 240
 
@@ -49,8 +49,8 @@ desired_bpm = 240
 pixels_per_beat = number_of_pixels // (desired_bpm*(desired_duration//60))
 
 notes = []
-min_octave = 1
-max_octave = 4
+min_octave = 4
+max_octave = 6
 octave_range = (max_octave - min_octave) + 1
 
 for pixels in range(0, number_of_pixels, pixels_per_beat):
@@ -60,16 +60,15 @@ for pixels in range(0, number_of_pixels, pixels_per_beat):
     max_item, occurs = findmaxoccurence(group)
     value = max_item % (12 * octave_range)
     duration = float(occurs)/float(len(group)) * 10
-    octave = min_octave
-    notes.append(Note(value=value, dur=duration, octave=octave))
+    notes.append(Note(value=value, dur=duration, octave=min_octave))
 
-print(notes[0].verbose)
 midi = Midi(tempo=desired_bpm)
 midi.seq_notes(NoteSeq(notes))
 midi.write('monaLisa(%sbpm).midi' %(desired_bpm))
-print "Playing music"
-print music.load('monaLisa(%sbpm).midi' %(desired_bpm))
+print "Playing music - Song Name, %s"
+music.load('monaLisa(%sbpm).midi' %(desired_bpm))
 music.play()
+
 while music.get_busy() :
 	#Make sure the program stays open to allow the song to actually play
     pass
