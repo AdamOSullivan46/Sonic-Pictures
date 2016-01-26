@@ -13,6 +13,12 @@ class ITMInterface {
     static Panel durPanel;
     static Label durLabel;
     static TextField duration;
+    static Panel bpmPanel;
+    static TextField bpm;
+    static Label bpmLabel;
+    static Panel conversionPanel;
+    static Label conversionLabel;
+    static Button convert;
     static JFileChooser fileChooser;
     static FileNameExtensionFilter filter;
     static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -31,7 +37,8 @@ class ITMInterface {
         initialiseFileDialog();
         createFilePanel();
         createDurationPanel();
-        // createBPMPanel();
+        createBPMPanel();
+        createConversionPanel();
 
         //Auto size and display window
         mainFrame.pack();
@@ -82,6 +89,38 @@ class ITMInterface {
 
         //Add the panel to the main window
         mainFrame.add(durPanel);
+    }
+
+    static void createBPMPanel() {
+        //Create the panel
+        bpmPanel = new Panel(new GridLayout(2,1));
+        //Create the TextField
+        bpm = new TextField();
+        //Create the Label
+        bpmLabel = new Label("Beats per minute (60 - 240)");
+
+        //Add components to the panel
+        bpmPanel.add(bpmLabel);
+        bpmPanel.add(bpm);
+
+        //Add the panel to the main window
+        mainFrame.add(bpmPanel);
+    }
+
+    static void createConversionPanel() {
+        //Create the panel
+        conversionPanel = new Panel(new GridLayout(2,1));
+        //Create the Label
+        conversionLabel = new Label();
+        //Create the Button
+        convert = new Button("Convert!");
+
+        //Add components to the panel
+        conversionPanel.add(conversionLabel);
+        conversionPanel.add(convert);
+
+        //Add the panel to the main window
+        mainFrame.add(conversionPanel);
     }
 
     static void browseForFile() {
