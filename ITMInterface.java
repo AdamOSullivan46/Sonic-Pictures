@@ -11,20 +11,14 @@ class ITMInterface {
     static Button browse;
     static JFileChooser fileChooser;
     static FileNameExtensionFilter filter;
-<<<<<<< HEAD
     static Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-=======
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
 
     public static void main(String[] args) {
         //Create and initialise the frame
         mainFrame = new Frame();
         mainFrame.setResizable(false);
         mainFrame.addWindowListener(new WindowAdapter() { public void windowClosing(WindowEvent we) {mainFrame.dispose();} } );
-<<<<<<< HEAD
         mainFrame.setTitle("Sonic Pictures");
-=======
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
 
         //Create all the panels
         initialiseFileDialog();
@@ -32,10 +26,7 @@ class ITMInterface {
 
         //Auto size and display window
         mainFrame.pack();
-<<<<<<< HEAD
         centerFrame();
-=======
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
         mainFrame.setVisible(true);
 
     }
@@ -44,11 +35,8 @@ class ITMInterface {
         //Initialises but doesn't show the file window
         fileChooser = new JFileChooser();
         filter = new FileNameExtensionFilter(
-<<<<<<< HEAD
             "Images", "jpg", "png", "gif", "jpeg");
-=======
             "Images", "jpg", "png", "gif");
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
         fileChooser.setFileFilter(filter);
     }
 
@@ -62,11 +50,8 @@ class ITMInterface {
 
         //Now edit these things
         fileName.setEditable(false);
-<<<<<<< HEAD
         browse.addActionListener(new ActionListener() { public void actionPerformed(ActionEvent ae){browseForFile();}});
-=======
         browse.addActionListener(mainFrame);
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
 
         //Add the components to the panel
         filePanel.add(fileName);
@@ -76,16 +61,13 @@ class ITMInterface {
         mainFrame.add(filePanel);
     }
 
-<<<<<<< HEAD
     static void browseForFile() {
-=======
     public void actionPerformed(ActionEvent ae){
             browseForFile();
     }
 
     static void browseForFile() {
         System.out.println("browse");
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
         int returnVal = fileChooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
             System.out.println("You chose to open this file: " +
@@ -93,7 +75,6 @@ class ITMInterface {
         }
     }
 
-<<<<<<< HEAD
     static void centerFrame() {
         int screenWidth = screenSize.width;
         int screenHeight = screenSize.height;
@@ -105,6 +86,4 @@ class ITMInterface {
 
         mainFrame.setLocation(x, y);
     }
-=======
->>>>>>> 94d9b498383e2471c7481a397ceaab3642c41c83
 }
