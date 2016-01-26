@@ -4,6 +4,16 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.*;
 import java.awt.Color.*;
 
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.Synthesizer;
+import javax.sound.midi.MidiChannel;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+
+import java.io.*;
+import java.util.Arrays;
+
 class ITMInterface {
 
     static Frame mainFrame;
@@ -144,5 +154,115 @@ class ITMInterface {
         int y = (screenHeight / 2) - (windowHeight / 2);
 
         mainFrame.setLocation(x, y);
+    }
+    
+    
+    
+    public static void play(String filename, int desired_duration, int desired_bpm) {
+
+        int number_of_pixels;
+        int pixels_per_beat;
+
+        int channel = 0;
+
+        int volume = 127; // between 0 and 127
+        int duration; // in milliseconds
+
+        try {
+            BufferedImage image = ImageIO.read(new File(filename));
+            int height = image.getHeight();
+            int width = image.getWidth();
+
+            number_of_pixels = height*width;
+
+            int[] colors;
+            colors = new int[height*width];
+            int[] durations;
+            durations = new int[height*width];
+            int[] instraments;
+            instraments = new int[height*width];
+
+            int count = 0;
+            for(int i=0; i<height; i++) {
+                for(int j=0; j<width; j++) {
+                    
+                    Color c = new Color(image.getRGB(j, i));
+
+                    colors[count] = c.getGreen();
+                    durations[count] = c.getBlue();
+                    instraments[count] = c.getRed();
+                    count++;
+                }
+            }
+
+            pixels_per_beat = number_of_pixels / (desired_bpm * (desired_duration/60));
+
+            int number_of_notes = number_of_pixels/pixels_per_beat;
+            int[] notes;
+            notes = new int[number_of_notes];
+            int[] durations_used;
+            durations_used = new int[number_of_notes];
+            int[] instraments_used;
+            instraments_used = new int[number_of_notes];
+
+            count = 0;
+            for(int pixels=0; pixels<number_of_pixels; pixels+=pixels_per_beat) {
+                int[] group;
+                group = new int[number_of_pixels];
+                group = Arrays.copyOfRange(colors, pixels, pixels+pixels_per_beat);
+                int sum=0;
+                for(int pixel: group) {
+                    sum += pixel;
+                }
+                notes[count] = ((sum/pixels_per_beat)%50)+40;
+
+                group = Arrays.copyOfRange(durations, pixels, pixels+pixels_per_beat);
+                sum=0;
+                for(int pixel: group) {
+                    sum += pixel;
+                }
+                durations_used[count] = (sum/pixels_per_beat)*4;
+
+
+                group = Arrays.copyOfRange(instraments, pixels, pixels+pixels_per_beat);
+                sum=0;
+                for(int pixel: group) {
+                    sum += pixel;
+                }
+                instraments_used[count] = ((sum/pixels_per_beat)%3)+8;
+
+                count++;
+            }
+
+            duration = (int)((1f/((float)(desired_bpm/60)))*1000);
+
+            Synthesizer synth = MidiSystem.getSynthesizer();
+            synth.open();
+            MidiChannel[] channels = synth.getChannels();
+
+            for(int i=0; i<number_of_notes; i++) {
+                int note = notes[i];
+                duration = durations_used[i];
+                channel = instraments_used[i];
+
+                if(channel == 9) {
+                    channels[channel+1].noteOn(note, volume);
+                    volume /= 3;
+                }
+                
+                channels[channel].noteOn(note, volume);
+                Thread.sleep(duration);
+                channels[channel].noteOff(note);
+                if(channel == 9) {
+                    channels[channel+1].noteOff(note);
+                    volume *= 3;
+                }
+            }
+
+            synth.close();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
