@@ -198,12 +198,17 @@ class ITMInterface {
             pixels_per_beat = number_of_pixels / (desired_bpm * (desired_duration/60));
 
             int number_of_notes = number_of_pixels/pixels_per_beat;
+            
             int[] notes;
-            notes = new int[number_of_notes];
+            notes = new int[number_of_notes+1];
+            int[] notes2;
+            notes2 = new int[number_of_notes+1];
+
             int[] durations_used;
-            durations_used = new int[number_of_notes];
+            durations_used = new int[number_of_notes+1];
+
             int[] instraments_used;
-            instraments_used = new int[number_of_notes];
+            instraments_used = new int[number_of_notes+1];
 
             count = 0;
             for(int pixels=0; pixels<number_of_pixels; pixels+=pixels_per_beat) {
@@ -214,14 +219,14 @@ class ITMInterface {
                 for(int pixel: group) {
                     sum += pixel;
                 }
-                notes[count] = ((sum/pixels_per_beat)%50)+40;
+                notes[count] = ((sum/pixels_per_beat)%50)+50;
 
                 group = Arrays.copyOfRange(durations, pixels, pixels+pixels_per_beat);
                 sum=0;
                 for(int pixel: group) {
                     sum += pixel;
                 }
-                durations_used[count] = (sum/pixels_per_beat)*4;
+                durations_used[count] = (sum/pixels_per_beat);
 
 
                 group = Arrays.copyOfRange(instraments, pixels, pixels+pixels_per_beat);
@@ -230,19 +235,37 @@ class ITMInterface {
                     sum += pixel;
                 }
                 instraments_used[count] = ((sum/pixels_per_beat)%3)+8;
+                notes2[count] = ((sum/pixels_per_beat)%50)+40;
 
                 count++;
             }
 
             duration = (int)((1f/((float)(desired_bpm/60)))*1000);
 
+            int total_time=0;
+            count=0;
+            for(int i=0; i<number_of_notes; i++){
+                total_time += durations_used[count];
+                count++;
+            }
+            System.out.println("Total time original: " + total_time/1000 + " seconds");
+            System.out.println("Off by: " + (desired_duration-(total_time/1000)) + " seconds");
+
+            float offset = (float)desired_duration/((float)total_time/1000f);
+            System.out.println("Offset: " + offset);
+            System.out.println("New off by: " + (desired_duration-((total_time/1000))*offset) + " seconds");
+            System.out.println("Total time new: " + ((total_time/1000)*offset) + " seconds");
+
             Synthesizer synth = MidiSystem.getSynthesizer();
             synth.open();
             MidiChannel[] channels = synth.getChannels();
 
+            System.out.println("Playing");
+
             for(int i=0; i<number_of_notes; i++) {
                 int note = notes[i];
-                duration = durations_used[i];
+                int note2 = notes2[i];
+                duration = (int)((float)durations_used[i]*offset);
                 channel = instraments_used[i];
 
                 if(channel == 9) {
@@ -251,8 +274,11 @@ class ITMInterface {
                 }
                 
                 channels[channel].noteOn(note, volume);
+                channels[channel].noteOn(note2, volume);
                 Thread.sleep(duration);
                 channels[channel].noteOff(note);
+                channels[channel].noteOff(note2);
+
                 if(channel == 9) {
                     channels[channel+1].noteOff(note);
                     volume *= 3;
